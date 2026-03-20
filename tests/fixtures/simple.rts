@@ -1,0 +1,26 @@
+Notes:
+	Simple RSI Crossover
+	from "RealTest For Dummies"
+	https://forum.mhptrading.com/t/realtest-for-dummies-guide/1614
+
+Import:
+	DataSource:	Yahoo
+	IncludeList:	SPY
+	StartDate:	1/1/2025
+	EndDate:	12/31/2025
+	SaveAs:	realtest_mcp_spy.rtd
+
+Settings:
+	DataFile:	realtest_mcp_spy.rtd
+	StartDate:	Earliest
+	EndDate:	Latest
+	SaveStatsAs:	?scriptpath?\stats.csv
+	SaveTradesAs:	?scriptpath?\trades.csv
+	SavePositionsAs:	?scriptpath?\positions.csv
+
+Parameters:
+	rsi_len:	From 5 To 20 Step 5 Def 10 {X}
+
+Strategy: SPY_Crossover
+	EntrySetup:	RSI(rsi_len) > 70
+	ExitRule:	RSI(rsi_len) < 30
