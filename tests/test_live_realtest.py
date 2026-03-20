@@ -78,11 +78,30 @@ def test_live_optimize_uses_simple_fixture() -> None:
     result = service.optimize(script)
 
     assert result.command == "optimize"
-    assert "timed out" not in (result.error or "").lower()
-    if result.ok:
-        assert result.error is None
-    else:
-        assert result.error
+    assert result.ok, result.error or result.stderr
+    assert result.error is None
+    assert result.stats_paths
+    assert result.trades_paths
+
+    stats_paths = [Path(path) for path in result.stats_paths]
+    trades_paths = [Path(path) for path in result.trades_paths]
+
+    for path in [*stats_paths, *trades_paths]:
+        assert path.exists(), f"missing output file: {path}"
+        assert path.stat().st_size > 0, f"empty output file: {path}"
+
+    assert [path.name for path in stats_paths] == [
+        "stats.1.csv",
+        "stats.2.csv",
+        "stats.3.csv",
+        "stats.4.csv",
+    ]
+    assert [path.name for path in trades_paths] == [
+        "trades.1.csv",
+        "trades.2.csv",
+        "trades.3.csv",
+        "trades.4.csv",
+    ]
 
 
 @pytest.mark.live

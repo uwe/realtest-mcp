@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 
 class CommandResult(BaseModel):
@@ -22,7 +22,8 @@ class ImportResult(CommandResult):
 
 
 class OptimizeResult(CommandResult):
-    pass
+    stats_paths: list[str] = Field(default_factory=list)
+    trades_paths: list[str] = Field(default_factory=list)
 
 
 class TestResult(CommandResult):

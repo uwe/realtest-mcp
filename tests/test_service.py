@@ -14,6 +14,20 @@ class FakeCommandRunner:
         return self.results.pop(0)
 
 
+class WritingFakeCommandRunner:
+    def __init__(self, result: ProcessResult) -> None:
+        self.result = result
+
+    def run(self, command: list[str], cwd: Path | None = None) -> ProcessResult:
+        assert cwd is not None
+        (cwd / "stats.2.csv").write_text("stats2", encoding="utf-8")
+        (cwd / "stats.1.csv").write_text("stats1", encoding="utf-8")
+        (cwd / "trades.2.csv").write_text("trades2", encoding="utf-8")
+        (cwd / "trades.1.csv").write_text("trades1", encoding="utf-8")
+        (cwd / "positions.1.csv").write_text("ignored", encoding="utf-8")
+        return self.result
+
+
 def test_parse_returns_failure_with_error_log_message() -> None:
     with tempfile.TemporaryDirectory() as tmp_dir:
         root = Path(tmp_dir)
@@ -76,6 +90,32 @@ def test_optimize_returns_success_workspace_metadata() -> None:
         assert result.command == "optimize"
         assert result.script_path.endswith("script.rts")
         assert result.error is None
+        assert result.stats_paths == []
+        assert result.trades_paths == []
+
+
+def test_optimize_returns_parameterized_output_paths() -> None:
+    with tempfile.TemporaryDirectory() as tmp_dir:
+        root = Path(tmp_dir)
+        service = RealTestService(
+            WorkspaceAllocator(root / "scripts", 4),
+            RealTestRunner(
+                Path(r"C:\RealTest\RealTest.exe"),
+                root / "errorlog.txt",
+                WritingFakeCommandRunner(ProcessResult(returncode=0, stdout="optimized")),
+            ),
+        )
+
+        result = service.optimize("script body")
+
+        assert result.stats_paths == [
+            str(Path(result.script_dir) / "stats.1.csv"),
+            str(Path(result.script_dir) / "stats.2.csv"),
+        ]
+        assert result.trades_paths == [
+            str(Path(result.script_dir) / "trades.1.csv"),
+            str(Path(result.script_dir) / "trades.2.csv"),
+        ]
 
 
 def test_test_returns_csv_paths() -> None:

@@ -46,6 +46,8 @@ class FakeService:
             script_path="file",
             stdout=script,
             stderr="",
+            stats_paths=["stats.1.csv"],
+            trades_paths=["trades.1.csv"],
         )
 
     def test(self, script: str) -> BacktestResult:
@@ -120,7 +122,8 @@ def test_registered_tools_delegate_to_service() -> None:
     assert '"command": "import"' in import_result[0].text
     assert '"stdout": "import body"' in import_result[0].text
     assert '"command": "optimize"' in optimize_result[0].text
-    assert '"stdout": "optimize body"' in optimize_result[0].text
+    assert '"stats_paths": [' in optimize_result[0].text
+    assert '"trades_paths": [' in optimize_result[0].text
     assert '"command": "test"' in test_result[0].text
     assert '"stats_path": "stats.csv"' in test_result[0].text
 

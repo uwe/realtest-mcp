@@ -49,6 +49,8 @@ class RealTestService:
             stdout=result.stdout,
             stderr=result.stderr,
             error=self._build_error(result),
+            stats_paths=self._collect_output_paths(workspace.directory, "stats.*.csv"),
+            trades_paths=self._collect_output_paths(workspace.directory, "trades.*.csv"),
         )
 
     def test(self, script: str) -> TestResult:
@@ -75,3 +77,7 @@ class RealTestService:
             or result.stderr.strip()
             or "RealTest command failed"
         )
+
+    @staticmethod
+    def _collect_output_paths(directory, pattern: str) -> list[str]:
+        return [str(path) for path in sorted(directory.glob(pattern))]

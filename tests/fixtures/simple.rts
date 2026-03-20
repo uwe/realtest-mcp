@@ -18,6 +18,10 @@ Settings:
 	SaveTradesAs:	?scriptpath?\trades.csv
 	SavePositionsAs:	?scriptpath?\positions.csv
 
+OptimizeSettings:
+	OptNoDialog:	True
+	OptMultiSaveAs:	True
+
 Parameters:
 	rsi_len:	From 5 To 20 Step 5 Def 10 {X}
 
